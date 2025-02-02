@@ -1,11 +1,12 @@
 // Firebase configuration – replace these with your Firebase project settings.
 const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT_ID.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
+    apiKey: "AIzaSyDRgKYjFqK6geiMq-BdWoJShdo-UR7HOcw",
+    authDomain: "cmdbar-plugin-store.firebaseapp.com",
+    databaseURL: "https://cmdbar-plugin-store-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "cmdbar-plugin-store",
+    storageBucket: "cmdbar-plugin-store.firebasestorage.app",
+    messagingSenderId: "116790966011",
+    appId: "1:116790966011:web:84f9de037fde8551e0625e"
   };
   
   // Initialize Firebase
