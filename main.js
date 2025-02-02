@@ -15,10 +15,9 @@ const db = firebase.firestore();
 
 document.addEventListener('DOMContentLoaded', () => {
     // DOM element references
-    const discordLoginButton = document.getElementById("discord-login");
+    const discordUsernameInput = document.getElementById("discord-username-input");
     const loginFormDiv = document.getElementById("login-form");
     const simulateLoginBtn = document.getElementById("simulate-login-btn");
-    const discordUsernameInput = document.getElementById("discord-username-input");
     const userPanel = document.getElementById("user-panel");
     const welcomeMessage = document.getElementById("welcome-message");
     const logoutButton = document.getElementById("logout-btn");
@@ -30,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const pluginList = document.getElementById("plugin-list");
     const searchInput = document.getElementById("search-input");
 
-    // (For a working marketplace, you would use Discord OAuth. Here, we simulate login via a form.)
+    // Simulated login (using form input)
     const storedUser = getStoredUser();
     if (storedUser) {
         displayUserInfo(storedUser);
@@ -44,6 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
         sectionAll.classList.remove("hidden");
         sectionManage.classList.add("hidden");
     });
+
     navManage.addEventListener("click", (e) => {
         e.preventDefault();
         if (getStoredUser()) {
@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Simulated login form event
-    document.getElementById("simulate-login-btn").addEventListener("click", () => {
+    simulateLoginBtn.addEventListener("click", () => {
         const username = discordUsernameInput.value.trim();
         if (username.length < 2 || username.length > 32) {
             alert("Username must be between 2 and 32 characters.");
@@ -64,38 +64,35 @@ document.addEventListener('DOMContentLoaded', () => {
         displayUserInfo(user);
     });
 
-    // Logout event: clear user from localStorage and reload the page.
+    // Logout event
     logoutButton.addEventListener("click", () => {
         localStorage.removeItem("discordUser");
         window.location.reload();
     });
 
-    // Display user info and update UI for logged-in users.
+    // Display user info and update UI for logged-in users
     function displayUserInfo(user) {
         welcomeMessage.textContent = `Welcome, ${user.username}`;
         userPanel.classList.remove("hidden");
         loginFormDiv.classList.add("hidden");
         navManage.classList.remove("hidden");
-        // By default, show the Manage Plugins section.
+        // Show Manage Plugins section by default
         sectionManage.classList.remove("hidden");
         sectionAll.classList.add("hidden");
         loadUserPlugins(user.username);
     }
 
-    // Helper functions to get and store user in localStorage.
+    // Helper functions to get and store user in localStorage
     function getStoredUser() {
         const userStr = localStorage.getItem("discordUser");
         return userStr ? JSON.parse(userStr) : null;
     }
+
     function storeUser(user) {
         localStorage.setItem("discordUser", JSON.stringify(user));
     }
 
-    // -------------------------------
     // Firestore: Plugin Functions
-    // -------------------------------
-
-    // Get the next auto-increment plugin ID using a transaction on the "pluginCounter" document.
     async function getNextPluginId() {
         const counterRef = db.collection("counters").doc("pluginCounter");
         return db.runTransaction(async (transaction) => {
@@ -112,12 +109,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Save a plugin to Firestore.
+    // Save a plugin to Firestore
     async function savePlugin(plugin) {
         try {
             const nextId = await getNextPluginId();
             plugin.autoId = nextId;
-            // Save the plugin document.
             await db.collection("plugins").add(plugin);
             alert("Plugin added successfully!");
         } catch (error) {
@@ -126,7 +122,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Load all plugins (public view) from Firestore.
+    // Load all plugins (public view) from Firestore
     async function loadAllPlugins() {
         try {
             const snapshot = await db.collection("plugins")
@@ -143,7 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Load plugins for the current user (management view).
+    // Load plugins for the current user (management view)
     async function loadUserPlugins(username) {
         try {
             const snapshot = await db.collection("plugins")
@@ -161,11 +157,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Delete a plugin from Firestore by its document ID.
+    // Delete a plugin from Firestore
     async function deletePlugin(docId) {
         try {
             await db.collection("plugins").doc(docId).delete();
-            // Reload the lists after deletion.
             loadAllPlugins();
             const user = getStoredUser();
             if (user) loadUserPlugins(user.username);
@@ -174,9 +169,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Render a list of plugins into a container.
-    // If management is true, include a delete button.
-    // Additionally, if the logged-in user is "theboc", show delete buttons for every plugin.
+    // Render a list of plugins into a container
     function renderPluginList(plugins, container, management) {
         container.innerHTML = "";
         const currentUser = getStoredUser() ? getStoredUser().username.toLowerCase() : "";
@@ -190,12 +183,7 @@ document.addEventListener('DOMContentLoaded', () => {
               <p><strong>Author:</strong> ${plugin.author}</p>
             `;
             // Show a delete button if:
-            // - We are in the management view (the plugin belongs to the current user)
-            // OR if the current user (if logged in) is "theboc" (admin).
-            if (
-                management ||
-                (currentUser === "theboc" && currentUser !== "")
-            ) {
+            if (management || (currentUser === "theboc" && currentUser !== "")) {
                 const delBtn = document.createElement("button");
                 delBtn.textContent = "Delete Plugin";
                 delBtn.addEventListener("click", () => {
@@ -209,48 +197,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Search functionality for public plugins.
-    searchInput.addEventListener("input", async () => {
-        try {
-            const query = searchInput.value.toLowerCase();
-            const snapshot = await db.collection("plugins")
-                .orderBy("autoId", "asc")
-                .get();
-            const plugins = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            const filtered = plugins.filter(plugin =>
-                plugin.title.toLowerCase().includes(query) ||
-                (plugin.description && plugin.description.toLowerCase().includes(query)) ||
-                plugin.modelId.toLowerCase().includes(query) ||
-                plugin.author.toLowerCase().includes(query)
-            );
-            renderPluginList(filtered, pluginList, false);
-        } catch (error) {
-            console.error("Error during search:", error);
-        }
-    });
-
-    // Handle plugin form submission (only for logged-in users)
-    pluginForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const title = document.getElementById("plugin-title").value;
-        const modelId = document.getElementById("plugin-model-id").value;
-        const description = document.getElementById("plugin-description").value;
-        const user = getStoredUser();
-        if (!user) return;
-        const plugin = {
-            title,
-            modelId,
-            description,
-            author: user.username,
-            createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        };
-        await savePlugin(plugin);
-        // Reload lists after saving.
+    // Initialize by loading all plugins if the user is not logged in.
+    if (!getStoredUser()) {
         loadAllPlugins();
-        loadUserPlugins(user.username);
-        pluginForm.reset();
-    });
-
-    // Initially load all plugins from Firestore.
-    loadAllPlugins();
+    }
 });
