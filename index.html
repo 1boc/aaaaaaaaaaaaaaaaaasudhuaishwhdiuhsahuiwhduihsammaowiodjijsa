@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Plugin Marketplace</title>
   <link rel="stylesheet" href="main.css" />
+  <!-- Firebase SDKs (compat versions for simplicity) -->
+  <script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-auth-compat.js"></script>
 </head>
 <body>
   <header>
@@ -18,7 +22,13 @@
         <a href="#" id="nav-manage" class="hidden">Manage Plugins</a>
       </nav>
       <!-- Login / User Panel -->
-      <button id="discord-login" class="hidden">Log in with Discord</button>
+      <!-- For production, you’d use Discord OAuth.
+           Here we use a simple login form to simulate obtaining a Discord username. -->
+      <div id="login-form" class="login-form">
+        <input type="text" id="discord-username-input" placeholder="Enter your Discord username" required />
+        <button id="simulate-login-btn">Log in</button>
+      </div>
+      <!-- User panel (shown when logged in) -->
       <div id="user-panel" class="hidden">
         <span id="welcome-message"></span>
         <button id="logout-btn">Log Out</button>
@@ -27,14 +37,14 @@
   </header>
 
   <main>
-    <!-- Section: All Plugins (public view) -->
+    <!-- Public view: All Plugins -->
     <section id="section-all">
       <h2>All Available Plugins</h2>
       <input type="text" id="search-input" placeholder="Search plugins..." />
       <div id="plugin-list"></div>
     </section>
 
-    <!-- Section: Manage Plugins (only for logged-in users) -->
+    <!-- Manage Plugins (only visible when logged in) -->
     <section id="section-manage" class="hidden">
       <h2>Your Plugin Management</h2>
       <form id="plugin-form">

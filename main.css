@@ -59,6 +59,12 @@ body {
     background: #666;
   }
   
+  .login-form input {
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+  }
+  
   .hidden {
     display: none;
   }
