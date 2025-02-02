@@ -1,63 +1,69 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Plugin Marketplace</title>
-  <link rel="stylesheet" href="main.css" />
-  <!-- Firebase SDKs (compat versions for simplicity) -->
-  <script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-auth-compat.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RetroStudio Plugin Marketplace</title>
+  <link rel="stylesheet" href="style.css"> <!-- Add your custom styles here -->
 </head>
 <body>
   <header>
-    <div class="header-left">
-      <h1>Plugin Marketplace</h1>
-    </div>
-    <div class="header-right">
-      <!-- Navigation Menu -->
-      <nav id="nav-menu">
-        <a href="#" id="nav-all">All Plugins</a>
-        <a href="#" id="nav-manage" class="hidden">Manage Plugins</a>
-      </nav>
-      <!-- Login / User Panel -->
-      <!-- For production, you’d use Discord OAuth.
-           Here we use a simple login form to simulate obtaining a Discord username. -->
-      <div id="login-form" class="login-form">
-        <input type="text" id="discord-username-input" placeholder="Enter your Discord username" required />
-        <button id="simulate-login-btn">Log in</button>
-      </div>
-      <!-- User panel (shown when logged in) -->
-      <div id="user-panel" class="hidden">
-        <span id="welcome-message"></span>
-        <button id="logout-btn">Log Out</button>
-      </div>
-    </div>
+    <h1>RetroStudio Plugin Marketplace</h1>
   </header>
 
-  <main>
-    <!-- Public view: All Plugins -->
-    <section id="section-all">
-      <h2>All Available Plugins</h2>
-      <input type="text" id="search-input" placeholder="Search plugins..." />
-      <div id="plugin-list"></div>
-    </section>
+  <!-- User Info Section (shown when logged in) -->
+  <div id="user-panel" class="hidden">
+    <p id="welcome-message"></p>
+    <button id="logout-btn">Log Out</button>
+  </div>
 
-    <!-- Manage Plugins (only visible when logged in) -->
-    <section id="section-manage" class="hidden">
-      <h2>Your Plugin Management</h2>
-      <form id="plugin-form">
-        <input type="text" id="plugin-title" placeholder="Plugin Title" required />
-        <input type="text" id="plugin-model-id" placeholder="Model ID" required />
-        <textarea id="plugin-description" placeholder="Plugin Description (Optional)"></textarea>
-        <button type="submit">Publish Plugin</button>
-      </form>
-      <h3>Your Plugins</h3>
-      <div id="user-plugin-list"></div>
-    </section>
-  </main>
+  <!-- Login Form (shown when no user is logged in) -->
+  <div id="login-form" class="hidden">
+    <label for="discord-username-input">Enter your Discord Username</label>
+    <input type="text" id="discord-username-input" placeholder="Your Discord Username">
+    <button id="simulate-login-btn">Log In</button>
+  </div>
 
-  <script src="main.js"></script>
+  <!-- Navigation Menu -->
+  <nav>
+    <ul>
+      <li><a href="#" id="nav-all">All Plugins</a></li>
+      <li><a href="#" id="nav-manage">Manage Plugins</a></li>
+    </ul>
+  </nav>
+
+  <!-- Section for Viewing All Plugins -->
+  <section id="section-all" class="hidden">
+    <h2>All Plugins</h2>
+    <input type="text" id="search-input" placeholder="Search for plugins...">
+    <div id="plugin-list"></div>
+  </section>
+
+  <!-- Section for Managing Plugins (only visible to logged-in users) -->
+  <section id="section-manage" class="hidden">
+    <h2>Manage Your Plugins</h2>
+    <form id="plugin-form">
+      <label for="plugin-title">Plugin Title</label>
+      <input type="text" id="plugin-title" required>
+
+      <label for="plugin-model-id">Model ID</label>
+      <input type="text" id="plugin-model-id" required>
+
+      <label for="plugin-description">Description</label>
+      <textarea id="plugin-description" required></textarea>
+
+      <button type="submit">Submit Plugin</button>
+    </form>
+
+    <h3>Your Plugins</h3>
+    <div id="user-plugin-list"></div>
+  </section>
+
+  <!-- Placeholder for Plugin Cards -->
+  <div id="plugin-cards-placeholder"></div>
+
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
