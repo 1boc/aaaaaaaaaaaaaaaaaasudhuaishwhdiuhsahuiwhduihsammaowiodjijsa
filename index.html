@@ -12,7 +12,7 @@
       <h1>Plugin Marketplace</h1>
     </div>
     <div class="header-right">
-      <!-- This block is always visible for login status -->
+      <!-- Login / User Panel -->
       <button id="discord-login" class="hidden">Log in with Discord</button>
       <div id="user-panel" class="hidden">
         <span id="welcome-message"></span>
@@ -22,13 +22,14 @@
   </header>
 
   <main>
-    <!-- Plugin list: visible to everyone -->
+    <!-- Public Plugin Display with Search (visible to all users) -->
     <section id="plugin-display">
-      <h2>Plugins</h2>
+      <h2>All Available Plugins</h2>
+      <input type="text" id="search-input" placeholder="Search plugins..." />
       <div id="plugin-list"></div>
     </section>
 
-    <!-- Plugin management: only visible when logged in -->
+    <!-- Plugin Management (only for logged-in users) -->
     <section id="plugin-management" class="hidden">
       <h2>Your Plugin Management</h2>
       <form id="plugin-form">
