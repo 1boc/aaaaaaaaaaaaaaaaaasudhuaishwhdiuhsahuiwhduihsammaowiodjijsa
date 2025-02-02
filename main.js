@@ -1,46 +1,57 @@
-import { initializeApp } from "firebase/app";
-import { getAuth, signInWithPopup, OAuthProvider, onAuthStateChanged, signOut } from "firebase/auth";
-import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "firebase/firestore";
-
-// Firebase configuration (already provided)
-const firebaseConfig = {
-  apiKey: "AIzaSyDRgKYjFqK6geiMq-BdWoJShdo-UR7HOcw",
-  authDomain: "cmdbar-plugin-store.firebaseapp.com",
-  databaseURL: "https://cmdbar-plugin-store-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "cmdbar-plugin-store",
-  storageBucket: "cmdbar-plugin-store.firebasestorage.app",
-  messagingSenderId: "116790966011",
-  appId: "1:116790966011:web:84f9de037fde8551e0625e"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-
-// DOM Elements
+// Firebase and DOM elements
 const discordLoginBtn = document.getElementById("discord-login");
+const myPluginsBtn = document.getElementById("my-plugins-btn");
+const createPluginBtn = document.getElementById("create-plugin-btn");
 const uploadBtn = document.getElementById("upload-plugin");
 const modelIdInput = document.getElementById("model-id");
 const titleInput = document.getElementById("title");
 const descriptionInput = document.getElementById("description");
 const pluginList = document.getElementById("plugin-list");
+const myPluginList = document.getElementById("my-plugin-list");
+const searchInput = document.getElementById("plugin-search");
+const userMenu = document.getElementById("user-menu");
+const pluginUpload = document.getElementById("plugin-upload");
+const myPluginsSection = document.getElementById("my-plugins");
+const logoutBtn = document.getElementById("logout-btn");
 
-// Discord Login
+// Firebase authentication and Firestore operations
 discordLoginBtn.addEventListener("click", async () => {
   const provider = new OAuthProvider('discord.com');
   provider.setCustomParameters({
     'redirect_uri': 'https://1boc.github.io/cmdbar/',
     'scope': 'identify+openid'
   });
+
   try {
     const result = await signInWithPopup(auth, provider);
     const user = result.user;
     localStorage.setItem('discordUserId', user.uid);
-    console.log('Logged in as:', user.displayName);
+    userMenu.style.display = 'block';
+    loadPlugins();
+    loadUserPlugins();
   } catch (error) {
     console.error("Error during Discord login:", error);
   }
+});
+
+logoutBtn.addEventListener("click", () => {
+  signOut(auth).then(() => {
+    localStorage.removeItem('discordUserId');
+    userMenu.style.display = 'none';
+    loadPlugins();  // Reload plugin list for non-logged-in users
+  }).catch((error) => {
+    console.error("Error logging out:", error);
+  });
+});
+
+myPluginsBtn.addEventListener("click", () => {
+  pluginUpload.style.display = 'none';
+  myPluginsSection.style.display = 'block';
+});
+
+createPluginBtn.addEventListener("click", () => {
+  pluginUpload.style.display = 'block';
+  myPluginsSection.style.display = 'none';
 });
 
 // Upload Plugin
@@ -50,7 +61,7 @@ uploadBtn.addEventListener("click", async () => {
     alert("You need to log in with Discord first.");
     return;
   }
-  
+
   const modelId = modelIdInput.value;
   const title = titleInput.value;
   const description = descriptionInput.value;
@@ -76,7 +87,27 @@ uploadBtn.addEventListener("click", async () => {
   }
 });
 
-// Load User Plugins
+// Load all plugins
+async function loadPlugins() {
+  const querySnapshot = await getDocs(collection(db, "plugins"));
+  pluginList.innerHTML = ""; // Clear current list
+  querySnapshot.forEach(doc => {
+    const plugin = doc.data();
+    const pluginCard = document.createElement('div');
+    pluginCard.classList.add('plugin-card');
+    pluginCard.innerHTML = `
+      <div>
+        <strong>${plugin.title}</strong><br>
+        Model ID: ${plugin.modelId}<br>
+        Published by: ${plugin.discordUsername}<br>
+        ${plugin.description ? `<em>${plugin.description}</em>` : ""}
+      </div>
+    `;
+    pluginList.appendChild(pluginCard);
+  });
+}
+
+// Load user plugins
 async function loadUserPlugins() {
   const userId = localStorage.getItem('discordUserId');
   if (!userId) {
@@ -84,7 +115,7 @@ async function loadUserPlugins() {
   }
 
   const querySnapshot = await getDocs(collection(db, "plugins"));
-  pluginList.innerHTML = ""; // Clear current list
+  myPluginList.innerHTML = ""; // Clear current list
   querySnapshot.forEach(doc => {
     const plugin = doc.data();
     if (plugin.userId === userId) {
@@ -94,30 +125,16 @@ async function loadUserPlugins() {
         <div>
           <strong>${plugin.title}</strong><br>
           Model ID: ${plugin.modelId}<br>
-          ${plugin.description ? `<em>${plugin.description}</em>` : ""}
+          <button onclick="deletePlugin('${doc.id}')">Delete</button>
         </div>
-        <button onclick="deletePlugin('${doc.id}')">Delete</button>
       `;
-      pluginList.appendChild(pluginCard);
+      myPluginList.appendChild(pluginCard);
     }
   });
 }
 
-// Delete Plugin
+// Delete user plugin
 async function deletePlugin(pluginId) {
-  try {
-    await deleteDoc(doc(db, "plugins", pluginId));
-    alert("Plugin deleted!");
-    loadUserPlugins(); // Refresh the list
-  } catch (error) {
-    console.error("Error deleting plugin:", error);
-  }
+  await deleteDoc(doc(db, "plugins", pluginId));
+  loadUserPlugins();
 }
-
-// Automatically load user plugins if logged in
-onAuthStateChanged(auth, user => {
-  if (user) {
-    loadUserPlugins();
-  }
-});
-

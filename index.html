@@ -5,28 +5,36 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Plugin Marketplace</title>
   <link rel="stylesheet" href="style.css">
-  <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-firestore.js"></script>
+  <script type="module" src="app.js" defer></script>
 </head>
 <body>
   <div class="auth-container">
     <button id="discord-login" class="login-btn">Login with Discord</button>
   </div>
 
-  <div class="plugin-upload">
+  <div id="user-menu" class="user-menu" style="display: none;">
+    <button id="my-plugins-btn">My Plugins</button>
+    <button id="create-plugin-btn">Create Plugin</button>
+    <button id="logout-btn">Logout</button>
+  </div>
+
+  <div id="all-plugins">
+    <h2>All Plugins</h2>
+    <input type="text" id="plugin-search" placeholder="Search Plugins">
+    <div id="plugin-list"></div>
+  </div>
+
+  <div id="plugin-upload" style="display: none;">
     <h2>Upload Plugin</h2>
     <input type="text" id="model-id" placeholder="Model ID" required>
     <input type="text" id="title" placeholder="Title" required>
     <textarea id="description" placeholder="Description (Optional)"></textarea>
-    <button id="upload-plugin" class="action-btn">Upload Plugin</button>
+    <button id="upload-plugin">Upload Plugin</button>
   </div>
 
-  <div class="my-plugins">
+  <div id="my-plugins" style="display: none;">
     <h2>My Plugins</h2>
-    <div id="plugin-list"></div>
+    <div id="my-plugin-list"></div>
   </div>
-
-  <script src="app.js"></script>
 </body>
 </html>
