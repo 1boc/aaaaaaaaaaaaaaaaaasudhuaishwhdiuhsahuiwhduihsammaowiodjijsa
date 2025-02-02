@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const pluginList = document.getElementById("plugin-list");
     const searchInput = document.getElementById("search-input");
   
-    // Replace with your actual Discord OAuth URL (make sure redirect_uri is correct)
+    // Replace with your actual Discord OAuth URL (ensure the client_id and redirect_uri are correct)
     const DISCORD_OAUTH_URL = "https://discord.com/oauth2/authorize?client_id=1335621884259336303&response_type=code&redirect_uri=https%3A%2F%2F1boc.github.io%2Fcmdbar%2F&scope=identify";
   
     // Check login state from localStorage
@@ -26,8 +26,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Load all plugins for public display
     loadAllPlugins();
   
-    // Event Listener for Discord login button
+    // Debug: Log click event
     discordLoginButton.addEventListener("click", () => {
+      console.log("Discord login button clicked");
       // Redirect to Discord OAuth for authentication
       window.location.href = DISCORD_OAUTH_URL;
     });
@@ -66,7 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // Simulate network delay and return a dummy user with a Discord username
       return new Promise(resolve => {
         setTimeout(() => {
-          resolve({ username: "ActualDiscordUser" });
+          resolve({ username: "ActualDiscordUser" }); // Replace with actual Discord data
         }, 1000);
       });
     }
@@ -148,8 +149,8 @@ document.addEventListener('DOMContentLoaded', () => {
       pluginForm.reset();
     });
   });
-  
-  // Global deletePlugin function for use in inline event listeners (if needed)
+    
+  // Global deletePlugin function (if needed)
   function deletePlugin(id) {
     let plugins = JSON.parse(localStorage.getItem("plugins")) || [];
     plugins = plugins.filter(plugin => plugin.id !== id);
@@ -158,16 +159,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const storedUser = localStorage.getItem("discordUser");
     if (storedUser) {
       const user = JSON.parse(storedUser);
-      // Update user management list
       const userPluginList = document.getElementById("user-plugin-list");
       const userPlugins = plugins.filter(plugin => plugin.author === user.username);
       renderPluginList(userPlugins, userPluginList, true);
     }
-    // Update public list
     const pluginList = document.getElementById("plugin-list");
     renderPluginList(plugins, pluginList, false);
   }
-  
+    
   // Helper: Render a plugin list (moved outside of DOMContentLoaded for reuse)
   function renderPluginList(plugins, container, management) {
     container.innerHTML = "";
