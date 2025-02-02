@@ -7,9 +7,9 @@ const logoutButton = document.getElementById("logout-btn");
 // Discord OAuth URL (update with your actual redirect_uri)
 const DISCORD_OAUTH_URL = "https://discord.com/oauth2/authorize?client_id=1335621884259336303&response_type=code&redirect_uri=https%3A%2F%2F1boc.github.io%2Fcmdbar%2F&scope=identify";
 
-// Check if the user is already logged in using sessionStorage
-if (sessionStorage.getItem("discordUser")) {
-    const user = JSON.parse(sessionStorage.getItem("discordUser"));
+// Check if the user is already logged in using localStorage
+if (localStorage.getItem("discordUser")) {
+    const user = JSON.parse(localStorage.getItem("discordUser"));
     displayUserInfo(user);
 } else {
     discordLoginButton.classList.remove("hidden"); // Show login button
@@ -23,8 +23,8 @@ discordLoginButton.addEventListener("click", () => {
 
 // Event Listener for the logout button
 logoutButton.addEventListener("click", () => {
-    // Clear user data from sessionStorage
-    sessionStorage.removeItem("discordUser");
+    // Clear user data from localStorage
+    localStorage.removeItem("discordUser");
     window.location.reload(); // Reload the page to reset the state
 });
 
@@ -33,6 +33,7 @@ function displayUserInfo(user) {
     discordLoginButton.classList.add("hidden"); // Hide login button
     userInfoDiv.classList.remove("hidden"); // Show user info section
     welcomeMessage.innerHTML = `Welcome, ${user.username}`;
+    logoutButton.classList.remove("hidden"); // Show logout button
 }
 
 // Simulating receiving the Discord user info after OAuth redirect
@@ -44,7 +45,7 @@ window.onload = function() {
     if (code) {
         // Handle OAuth code and fetch user data (this step is typically done server-side)
         fetchDiscordUserData(code).then(user => {
-            sessionStorage.setItem("discordUser", JSON.stringify(user));
+            localStorage.setItem("discordUser", JSON.stringify(user));
             displayUserInfo(user);
         });
     }
