@@ -4,10 +4,141 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>RetroStudio Plugin Marketplace</title>
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
+  <!-- Firebase SDK as Modules -->
+  <script type="module">
+    // Firebase Configuration
+    const firebaseConfig = {
+      apiKey: "your-api-key",
+      authDomain: "your-project-id.firebaseapp.com",
+      projectId: "your-project-id",
+      storageBucket: "your-project-id.appspot.com",
+      messagingSenderId: "your-sender-id",
+      appId: "your-app-id"
+    };
+
+    // Import Firebase SDK
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+    import { getAuth, signInWithCredential, OAuthProvider } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+    import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-storage.js";
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth();
+    const db = getFirestore();
+    const storage = getStorage();
+
+    // OAuth provider URL for Discord login
+    const discordAuthUrl = "https://discord.com/oauth2/authorize?client_id=1335621884259336303&response_type=code&redirect_uri=https%3A%2F%2F1boc.github.io%2Fcmdbar%2F&scope=identify+openid";
+
+    // Redirect user to Discord for OAuth login
+    document.getElementById('discord-login').addEventListener('click', () => {
+      window.location.href = discordAuthUrl;
+    });
+
+    // Handle the OAuth redirect and exchange code for token
+    window.addEventListener('DOMContentLoaded', async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const code = urlParams.get('code');
+      
+      if (code) {
+        // You now have the authorization code
+        console.log('Received code:', code);
+        
+        // Firebase sign-in or create new user flow can go here
+        const credential = OAuthProvider.credential({ code });
+        const userCredential = await signInWithCredential(auth, credential);
+        console.log('Authenticated user:', userCredential.user);
+        loadMarketplace();
+      }
+    });
+
+    // Load marketplace features based on user authentication
+    function loadMarketplace() {
+      const user = auth.currentUser;
+      if (user) {
+        document.getElementById('login-section').style.display = 'none';
+        document.getElementById('upload-section').style.display = 'block';
+        document.getElementById('plugin-list-section').style.display = 'block';
+        
+        loadPlugins();
+        checkIfAdmin(user);
+      }
+    }
+
+    // Check if the user is an admin (based on custom claims or UID)
+    async function checkIfAdmin(user) {
+      if (user.uid === "admin-uid") {  // Replace with actual admin UID or check via Firebase Custom Claims
+        document.getElementById('moderation-section').style.display = 'block';
+        loadModeration();
+      }
+    }
+
+    // Load uploaded plugins from Firestore
+    async function loadPlugins() {
+      const pluginListDiv = document.getElementById('plugin-list');
+      const pluginSnapshot = await getDocs(collection(db, 'plugins'));
+      pluginListDiv.innerHTML = '';
+      
+      pluginSnapshot.forEach(doc => {
+        const plugin = doc.data();
+        const pluginItem = document.createElement('div');
+        pluginItem.innerHTML = `
+          <h3>${plugin.name}</h3>
+          <a href="${plugin.url}" target="_blank">Download</a>
+        `;
+        pluginListDiv.appendChild(pluginItem);
+      });
+    }
+
+    // Load plugins for moderation (admin view)
+    async function loadModeration() {
+      const moderationListDiv = document.getElementById('moderation-list');
+      const moderationSnapshot = await getDocs(collection(db, 'plugins'));
+      moderationListDiv.innerHTML = '';
+      
+      moderationSnapshot.forEach(doc => {
+        const plugin = doc.data();
+        const pluginItem = document.createElement('div');
+        pluginItem.innerHTML = `
+          <h3>${plugin.name}</h3>
+          <button onclick="deletePlugin('${doc.id}')">Delete</button>
+        `;
+        moderationListDiv.appendChild(pluginItem);
+      });
+    }
+
+    // Delete plugin (admin only)
+    async function deletePlugin(pluginId) {
+      await deleteDoc(doc(db, 'plugins', pluginId));
+      loadModeration();
+    }
+
+    // Upload plugin to Firebase Storage and Firestore
+    document.getElementById('upload-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const file = document.getElementById('plugin-file').files[0];
+      const pluginName = document.getElementById('plugin-name').value;
+      
+      if (file && pluginName) {
+        // Upload the file to Firebase Storage
+        const storageRef = ref(storage, 'plugins/' + file.name);
+        await uploadBytes(storageRef, file);
+
+        // Save plugin details to Firestore
+        const fileURL = await getDownloadURL(storageRef);
+        await addDoc(collection(db, 'plugins'), {
+          name: pluginName,
+          url: fileURL,
+          uploadedBy: auth.currentUser.uid,
+          timestamp: new Date()
+        });
+
+        loadPlugins();
+      }
+    });
+  </script>
 </head>
 <body>
   <h1>RetroStudio Plugin Marketplace</h1>
@@ -38,140 +169,5 @@
     <h2>Moderation</h2>
     <div id="moderation-list"></div>
   </div>
-
-  <script type="module">
-    // Firebase Configuration
-    const firebaseConfig = {
-      apiKey: "your-api-key",
-      authDomain: "your-project-id.firebaseapp.com",
-      projectId: "your-project-id",
-      storageBucket: "your-project-id.appspot.com",
-      messagingSenderId: "your-sender-id",
-      appId: "your-app-id"
-    };
-
-    // Initialize Firebase
-    const firebase = await import('https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js');
-    const auth = await import('https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js');
-    const firestore = await import('https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js');
-    const storage = await import('https://www.gstatic.com/firebasejs/9.6.1/firebase-storage.js');
-    firebase.initializeApp(firebaseConfig);
-    
-    // Firebase Auth instance
-    const authInstance = auth.getAuth();
-    const db = firestore.getFirestore();
-    const storageInstance = storage.getStorage();
-
-    // OAuth provider URL for Discord login
-    const discordAuthUrl = "https://discord.com/oauth2/authorize?client_id=1335621884259336303&response_type=code&redirect_uri=https%3A%2F%2F1boc.github.io%2Fcmdbar%2F&scope=identify+openid";
-
-    // Redirect user to Discord for OAuth login
-    document.getElementById('discord-login').addEventListener('click', () => {
-      window.location.href = discordAuthUrl;
-    });
-
-    // Handle the OAuth redirect and exchange code for token
-    window.addEventListener('DOMContentLoaded', async () => {
-      const urlParams = new URLSearchParams(window.location.search);
-      const code = urlParams.get('code');
-      
-      if (code) {
-        // You now have the authorization code
-        console.log('Received code:', code);
-        
-        // Firebase sign-in or create new user flow can go here
-        const credential = await auth.OAuthProvider('discord.com').credential({ code });
-        const userCredential = await auth.signInWithCredential(authInstance, credential);
-        console.log('Authenticated user:', userCredential.user);
-        loadMarketplace();
-      }
-    });
-
-    // Load marketplace features based on user authentication
-    function loadMarketplace() {
-      const user = authInstance.currentUser;
-      if (user) {
-        document.getElementById('login-section').style.display = 'none';
-        document.getElementById('upload-section').style.display = 'block';
-        document.getElementById('plugin-list-section').style.display = 'block';
-        
-        loadPlugins();
-        checkIfAdmin(user);
-      }
-    }
-
-    // Check if the user is an admin (based on custom claims or UID)
-    async function checkIfAdmin(user) {
-      if (user.uid === "admin-uid") {  // Replace with actual admin UID or check via Firebase Custom Claims
-        document.getElementById('moderation-section').style.display = 'block';
-        loadModeration();
-      }
-    }
-
-    // Load uploaded plugins from Firestore
-    async function loadPlugins() {
-      const pluginListDiv = document.getElementById('plugin-list');
-      const pluginSnapshot = await firestore.getDocs(firestore.collection(db, 'plugins'));
-      pluginListDiv.innerHTML = '';
-      
-      pluginSnapshot.forEach(doc => {
-        const plugin = doc.data();
-        const pluginItem = document.createElement('div');
-        pluginItem.innerHTML = `
-          <h3>${plugin.name}</h3>
-          <a href="${plugin.url}" target="_blank">Download</a>
-        `;
-        pluginListDiv.appendChild(pluginItem);
-      });
-    }
-
-    // Load plugins for moderation (admin view)
-    async function loadModeration() {
-      const moderationListDiv = document.getElementById('moderation-list');
-      const moderationSnapshot = await firestore.getDocs(firestore.collection(db, 'plugins'));
-      moderationListDiv.innerHTML = '';
-      
-      moderationSnapshot.forEach(doc => {
-        const plugin = doc.data();
-        const pluginItem = document.createElement('div');
-        pluginItem.innerHTML = `
-          <h3>${plugin.name}</h3>
-          <button onclick="deletePlugin('${doc.id}')">Delete</button>
-        `;
-        moderationListDiv.appendChild(pluginItem);
-      });
-    }
-
-    // Delete plugin (admin only)
-    async function deletePlugin(pluginId) {
-      await firestore.deleteDoc(firestore.doc(db, 'plugins', pluginId));
-      loadModeration();
-    }
-
-    // Upload plugin to Firebase Storage and Firestore
-    document.getElementById('upload-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-
-      const file = document.getElementById('plugin-file').files[0];
-      const pluginName = document.getElementById('plugin-name').value;
-      
-      if (file && pluginName) {
-        // Upload the file to Firebase Storage
-        const storageRef = storage.getStorageRef(storageInstance, 'plugins/' + file.name);
-        await storage.uploadBytes(storageRef, file);
-
-        // Save plugin details to Firestore
-        const fileURL = await storage.getDownloadURL(storageRef);
-        await firestore.addDoc(firestore.collection(db, 'plugins'), {
-          name: pluginName,
-          url: fileURL,
-          uploadedBy: authInstance.currentUser.uid,
-          timestamp: new Date()
-        });
-
-        loadPlugins();
-      }
-    });
-  </script>
 </body>
 </html>
