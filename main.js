@@ -15,23 +15,10 @@ const myPluginsSection = document.getElementById("my-plugins");
 const logoutBtn = document.getElementById("logout-btn");
 
 // Firebase authentication and Firestore operations
-discordLoginBtn.addEventListener("click", async () => {
-  const provider = new OAuthProvider('discord.com');
-  provider.setCustomParameters({
-    'redirect_uri': 'https://1boc.github.io/cmdbar/',
-    'scope': 'identify+openid'
-  });
-
-  try {
-    const result = await signInWithPopup(auth, provider);
-    const user = result.user;
-    localStorage.setItem('discordUserId', user.uid);
-    userMenu.style.display = 'block';
-    loadPlugins();
-    loadUserPlugins();
-  } catch (error) {
-    console.error("Error during Discord login:", error);
-  }
+discordLoginBtn.addEventListener("click", () => {
+  // Open Discord OAuth URL in a new tab
+  const discordOAuthURL = "https://discord.com/oauth2/authorize?client_id=1335621884259336303&response_type=code&redirect_uri=https%3A%2F%2F1boc.github.io%2Fcmdbar%2F&scope=identify+openid";
+  window.open(discordOAuthURL, '_blank');
 });
 
 logoutBtn.addEventListener("click", () => {
