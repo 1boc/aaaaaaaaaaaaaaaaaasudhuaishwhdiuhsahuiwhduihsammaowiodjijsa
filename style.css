@@ -1,138 +1,66 @@
+/* Style for the page */
 body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    height: 100vh;
     margin: 0;
-    padding: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #f9f9f9;
-    color: #333;
-}
-
-header {
+  }
+  
+  .auth-container, .plugin-upload, .my-plugins {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    margin: 10px 0;
+    width: 80%;
+    max-width: 500px;
+  }
+  
+  button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background-color: #4CAF50;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  button:hover {
+    background-color: #45a049;
+  }
+  
+  input, textarea {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  textarea {
+    height: 100px;
+  }
+  
+  .plugin-card {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: #222;
-    padding: 15px 20px;
-    color: #fff;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-.header-left h1 {
-    margin: 0;
-    font-size: 1.5em;
-}
-
-.header-right {
-    display: flex;
-    align-items: center;
-}
-
-#nav-menu {
-    margin-right: 20px;
-}
-
-#nav-menu a {
-    color: #fff;
-    margin-right: 10px;
-    text-decoration: none;
-    font-weight: bold;
-    transition: color 0.2s;
-}
-
-#nav-menu a:hover {
-    color: #ddd;
-}
-
-header button,
-header div button {
-    margin-left: 10px;
-    padding: 8px 12px;
-    background: #444;
-    border: none;
-    border-radius: 4px;
-    color: #fff;
-    cursor: pointer;
-    transition: background 0.2s;
-}
-
-header button:hover,
-header div button:hover {
-    background: #666;
-}
-
-.login-form input {
-    padding: 8px;
-    border-radius: 4px;
-    border: 1px solid #ccc;
-    margin: 5px 0;
-    width: 100%;
-    box-sizing: border-box;
-}
-
-.hidden {
-    display: none;
-}
-
-main {
-    padding: 20px;
-}
-
-section {
-    margin-bottom: 40px;
-}
-
-#search-input {
-    width: 100%;
+    margin-bottom: 10px;
+    background: #f9f9f9;
     padding: 10px;
-    margin-bottom: 20px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 1em;
-    transition: border 0.3s ease;
-}
-
-#search-input:focus {
-    border-color: #4CAF50;
-    outline: none;
-}
-
-#plugin-list,
-#user-plugin-list {
-    margin-top: 20px;
-}
-
-.plugin-card {
-    background: #fff;
-    padding: 20px;
-    margin-bottom: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s ease-in-out;
-}
-
-.plugin-card:hover {
-    transform: translateY(-5px);
-}
-
-.plugin-card h3 {
-    font-size: 1.25em;
-    margin: 0 0 10px;
-}
-
-.plugin-card p {
-    margin: 5px 0;
-}
-
-.plugin-card button {
-    margin-top: 15px;
-    background: #b00;
-    border: none;
-    color: #fff;
-    padding: 8px 16px;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background 0.3s ease;
-}
-
-.plugin-card button:hover {
-    background: #d00;
-}
+    border-radius: 5px;
+  }
+  
+  .plugin-card button {
+    background-color: #ff4444;
+  }
+  
+  .plugin-card button:hover {
+    background-color: #ff2222;
+  }
+  
