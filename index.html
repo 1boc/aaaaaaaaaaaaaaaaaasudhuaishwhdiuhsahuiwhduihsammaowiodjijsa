@@ -9,23 +9,18 @@
 <body>
     <header>
         <h1>Cmdbar Plugin Marketplace</h1>
-        <button id="loginBtn">Login with Discord</button>
+        <div id="user-info">
+            <button id="login-btn">Login with Discord</button>
+            <span id="username"></span>
+            <button id="logout-btn" style="display: none;">Logout</button>
+        </div>
     </header>
 
-    <div class="search-container">
-        <input type="text" id="searchBar" placeholder="Search for plugins...">
-    </div>
-
+    <input type="text" id="search" placeholder="Search plugins...">
     <div id="plugin-list"></div>
 
-    <div id="add-plugin-section">
-        <h2>Add a Plugin</h2>
-        <input type="text" id="plugin-title" placeholder="Title">
-        <input type="text" id="plugin-model-id" placeholder="Model ID">
-        <textarea id="plugin-description" placeholder="Description"></textarea>
-        <button id="add-plugin-btn">Add Plugin</button>
-    </div>
-
-    <script type="module" src="script.js"></script>
+    <script src="firebase.js"></script>
+    <script src="auth.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>

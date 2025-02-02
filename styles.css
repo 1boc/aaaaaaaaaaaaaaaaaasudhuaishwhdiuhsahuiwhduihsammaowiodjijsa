@@ -1,63 +1,28 @@
 body {
     font-family: Arial, sans-serif;
-    background-color: #121212;
+    background-color: #1e1e2e;
     color: white;
     text-align: center;
-    padding: 20px;
 }
 
-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: #222;
-    padding: 15px;
-    border-radius: 5px;
-}
-
-button {
-    background: #7289DA;
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-.search-container {
-    margin: 20px 0;
-}
-
-input[type="text"], textarea {
-    width: 80%;
+#search {
     padding: 10px;
-    margin: 10px 0;
-    border: none;
-    border-radius: 5px;
+    margin: 20px auto;
+    width: 300px;
+    display: block;
 }
 
 #plugin-list {
     display: flex;
     flex-wrap: wrap;
+    gap: 15px;
     justify-content: center;
 }
 
 .plugin-card {
-    background: #1e1e1e;
+    background: #282a36;
     padding: 15px;
-    border-radius: 5px;
-    margin: 10px;
-    width: 300px;
+    border-radius: 8px;
+    width: 250px;
     text-align: left;
-}
-
-.plugin-card h3 {
-    color: #f39c12;
-}
-
-#add-plugin-section {
-    margin-top: 30px;
-    background: #222;
-    padding: 20px;
-    border-radius: 5px;
 }
