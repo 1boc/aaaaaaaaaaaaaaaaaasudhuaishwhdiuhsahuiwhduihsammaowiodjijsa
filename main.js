@@ -1,104 +1,62 @@
-const discordLoginButton = document.getElementById('discord-login');
-const pluginForm = document.getElementById('plugin-form');
-const pluginList = document.getElementById('plugin-list');
-const searchInput = document.getElementById('search-input');
-const discordUsername = document.getElementById('discord-username');
+// Discord OAuth and User Authentication
+const discordLoginButton = document.getElementById("discord-login");
+const userInfoDiv = document.getElementById("user-info");
+const welcomeMessage = document.getElementById("welcome-message");
+const logoutButton = document.getElementById("logout-btn");
 
-// Handle Discord login
-discordLoginButton.addEventListener('click', function () {
-  window.open("https://discord.com/oauth2/authorize?client_id=1335621884259336303&response_type=code&redirect_uri=https%3A%2F%2F1boc.github.io%2Fcmdbar%2F&scope=identify", "_blank");
+// Discord OAuth URL (update with your actual redirect_uri)
+const DISCORD_OAUTH_URL = "https://discord.com/oauth2/authorize?client_id=1335621884259336303&response_type=code&redirect_uri=https%3A%2F%2F1boc.github.io%2Fcmdbar%2F&scope=identify";
+
+// Check if the user is already logged in using sessionStorage
+if (sessionStorage.getItem("discordUser")) {
+    const user = JSON.parse(sessionStorage.getItem("discordUser"));
+    displayUserInfo(user);
+} else {
+    discordLoginButton.classList.remove("hidden"); // Show login button
+}
+
+// Event Listener for the Discord login button
+discordLoginButton.addEventListener("click", () => {
+    // Redirect user to Discord OAuth for authentication
+    window.location.href = DISCORD_OAUTH_URL;
 });
 
-// Check if the user is logged in and show their Discord username
-function checkDiscordLogin() {
-  const user = localStorage.getItem('discord-user');
-  if (user) {
-    const discordData = JSON.parse(user);
-    discordUsername.textContent = `Logged in as ${discordData.username}`;
-    pluginForm.style.display = 'block'; // Show form if logged in
-  } else {
-    discordUsername.textContent = 'Please log in with Discord to add plugins';
-    pluginForm.style.display = 'none'; // Hide form if not logged in
-  }
-}
-
-// Handle adding a plugin
-pluginForm.addEventListener('submit', function (event) {
-  event.preventDefault();
-
-  const title = document.getElementById('plugin-title').value;
-  const description = document.getElementById('plugin-description').value;
-  const author = document.getElementById('plugin-author').value;
-
-  const plugin = {
-    title,
-    description,
-    author,
-    id: Date.now()
-  };
-
-  savePlugin(plugin);
-  displayPlugins();
+// Event Listener for the logout button
+logoutButton.addEventListener("click", () => {
+    // Clear user data from sessionStorage
+    sessionStorage.removeItem("discordUser");
+    window.location.reload(); // Reload the page to reset the state
 });
 
-// Save plugin to localStorage
-function savePlugin(plugin) {
-  let plugins = JSON.parse(localStorage.getItem('plugins')) || [];
-  plugins.push(plugin);
-  localStorage.setItem('plugins', JSON.stringify(plugins));
+// Function to display user info after login
+function displayUserInfo(user) {
+    discordLoginButton.classList.add("hidden"); // Hide login button
+    userInfoDiv.classList.remove("hidden"); // Show user info section
+    welcomeMessage.innerHTML = `Welcome, ${user.username}`;
 }
 
-// Display all plugins
-function displayPlugins() {
-  const plugins = JSON.parse(localStorage.getItem('plugins')) || [];
-  pluginList.innerHTML = ''; // Clear current list
+// Simulating receiving the Discord user info after OAuth redirect
+// This part is usually handled server-side (OAuth token exchange)
+window.onload = function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get("code");
 
-  plugins.forEach((plugin) => {
-    const pluginCard = document.createElement('div');
-    pluginCard.classList.add('plugin-card');
-    pluginCard.innerHTML = `
-      <h3>${plugin.title}</h3>
-      <p>${plugin.description}</p>
-      <p><strong>Author:</strong> ${plugin.author}</p>
-      <button onclick="deletePlugin(${plugin.id})">Delete</button>
-    `;
-    pluginList.appendChild(pluginCard);
-  });
-}
-
-// Delete plugin
-function deletePlugin(id) {
-  let plugins = JSON.parse(localStorage.getItem('plugins')) || [];
-  plugins = plugins.filter(plugin => plugin.id !== id);
-  localStorage.setItem('plugins', JSON.stringify(plugins));
-  displayPlugins();
-}
-
-// Search functionality
-searchInput.addEventListener('input', function () {
-  const query = searchInput.value.toLowerCase();
-  const plugins = JSON.parse(localStorage.getItem('plugins')) || [];
-  const filteredPlugins = plugins.filter(plugin => plugin.title.toLowerCase().includes(query));
-  displayFilteredPlugins(filteredPlugins);
-});
-
-function displayFilteredPlugins(plugins) {
-  pluginList.innerHTML = '';
-  plugins.forEach((plugin) => {
-    const pluginCard = document.createElement('div');
-    pluginCard.classList.add('plugin-card');
-    pluginCard.innerHTML = `
-      <h3>${plugin.title}</h3>
-      <p>${plugin.description}</p>
-      <p><strong>Author:</strong> ${plugin.author}</p>
-      <button onclick="deletePlugin(${plugin.id})">Delete</button>
-    `;
-    pluginList.appendChild(pluginCard);
-  });
-}
-
-// Display plugins on page load
-window.onload = function () {
-  checkDiscordLogin();
-  displayPlugins();
+    if (code) {
+        // Handle OAuth code and fetch user data (this step is typically done server-side)
+        fetchDiscordUserData(code).then(user => {
+            sessionStorage.setItem("discordUser", JSON.stringify(user));
+            displayUserInfo(user);
+        });
+    }
 };
+
+// Function to fetch Discord user data (You would normally make this request to your server)
+async function fetchDiscordUserData(code) {
+    const response = await fetch(`/getDiscordUserData?code=${code}`);
+    if (response.ok) {
+        const user = await response.json();
+        return user;
+    } else {
+        console.error("Failed to fetch Discord user data");
+    }
+}

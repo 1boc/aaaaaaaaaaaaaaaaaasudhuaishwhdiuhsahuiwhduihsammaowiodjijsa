@@ -1,34 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Plugin Marketplace</title>
-  <link rel="stylesheet" href="main.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plugin Marketplace</title>
+    <link rel="stylesheet" href="main.css">
 </head>
 <body>
-  <header>
-    <h1>Welcome to the Plugin Marketplace</h1>
+    <header>
+        <h1>Welcome to the Plugin Marketplace</h1>
+        <div id="user-info" class="hidden">
+            <p id="welcome-message"></p>
+            <button id="logout-btn">Log Out</button>
+        </div>
+        <button id="discord-login" class="hidden">Log in with Discord</button>
+    </header>
 
-    <!-- Discord Login -->
-    <button id="discord-login">Log in with Discord</button>
-    <p id="discord-username"></p> <!-- Display Discord Username -->
-  </header>
+    <!-- Main Content (Plugins) -->
+    <main>
+        <div id="plugin-list">
+            <!-- Plugins will be listed here -->
+        </div>
+    </main>
 
-  <!-- Search and Plugins Display -->
-  <div>
-    <input type="text" id="search-input" placeholder="Search for plugins" />
-    <div id="plugin-list"></div>
-  </div>
-
-  <!-- Add New Plugin Form (Only visible if logged in) -->
-  <form id="plugin-form" style="display: none;">
-    <input type="text" id="plugin-title" placeholder="Plugin Title" required>
-    <input type="text" id="plugin-description" placeholder="Plugin Description">
-    <input type="text" id="plugin-author" placeholder="Plugin Author" required>
-    <button type="submit">Add Plugin</button>
-  </form>
-
-  <script src="main.js"></script>
+    <script src="main.js"></script>
 </body>
 </html>
