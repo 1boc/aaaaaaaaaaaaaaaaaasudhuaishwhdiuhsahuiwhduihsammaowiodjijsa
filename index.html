@@ -18,7 +18,7 @@
 
     // Import Firebase SDK
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-    import { getAuth, signInWithCredential, OAuthProvider } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+    import { getAuth, signInWithCredential, OAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
     import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
     import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-storage.js";
 
@@ -44,12 +44,20 @@
       if (code) {
         // You now have the authorization code
         console.log('Received code:', code);
+
+        // Instead of OAuthProvider.credential, we use OAuthProvider for Discord login
+        const provider = new OAuthProvider('discord.com');
+        provider.addScope('identify');
+        provider.addScope('email');
         
-        // Firebase sign-in or create new user flow can go here
-        const credential = OAuthProvider.credential({ code });
-        const userCredential = await signInWithCredential(auth, credential);
-        console.log('Authenticated user:', userCredential.user);
-        loadMarketplace();
+        try {
+          const result = await signInWithPopup(auth, provider);
+          const user = result.user;
+          console.log('Authenticated user:', user);
+          loadMarketplace();
+        } catch (error) {
+          console.error('Authentication error:', error);
+        }
       }
     });
 
