@@ -4,19 +4,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const userPanel = document.getElementById("user-panel");
     const welcomeMessage = document.getElementById("welcome-message");
     const logoutButton = document.getElementById("logout-btn");
-    const pluginManagementSection = document.getElementById("section-manage");
+    const navManage = document.getElementById("nav-manage");
+    const sectionAll = document.getElementById("section-all");
+    const sectionManage = document.getElementById("section-manage");
     const pluginForm = document.getElementById("plugin-form");
     const userPluginList = document.getElementById("user-plugin-list");
     const pluginList = document.getElementById("plugin-list");
     const searchInput = document.getElementById("search-input");
   
-    // Navigation menu references
-    const navAll = document.getElementById("nav-all");
-    const navManage = document.getElementById("nav-manage");
-    const sectionAll = document.getElementById("section-all");
-    const sectionManage = document.getElementById("section-manage");
-  
-    // Discord OAuth URL – update with your actual client_id and redirect_uri
+    // Replace with your actual Discord OAuth URL
+    // Ensure that client_id and redirect_uri are properly set in your Discord Developer Portal.
     const DISCORD_OAUTH_URL = "https://discord.com/oauth2/authorize?client_id=1335621884259336303&response_type=code&redirect_uri=https%3A%2F%2F1boc.github.io%2Fcmdbar%2F&scope=identify";
   
     // Check login state from localStorage
@@ -29,80 +26,75 @@ document.addEventListener('DOMContentLoaded', () => {
       discordLoginButton.classList.remove("hidden");
     }
   
-    // Always load the public plugin list
+    // Always load the public plugin list (visible to everyone)
     loadAllPlugins();
   
-    // Navigation Menu: switch between sections
-    navAll.addEventListener("click", (e) => {
+    // Navigation menu: switch between "All Plugins" and "Manage Plugins"
+    document.getElementById("nav-all").addEventListener("click", (e) => {
       e.preventDefault();
       sectionAll.classList.remove("hidden");
       sectionManage.classList.add("hidden");
     });
-  
     navManage.addEventListener("click", (e) => {
       e.preventDefault();
-      // Only show if the user is logged in
       if (localStorage.getItem("discordUser")) {
         sectionManage.classList.remove("hidden");
         sectionAll.classList.add("hidden");
       }
     });
   
-    // Discord Login Button Event
+    // Discord Login Button Event: redirect to Discord OAuth
     discordLoginButton.addEventListener("click", () => {
       console.log("Discord login button clicked");
       window.location.href = DISCORD_OAUTH_URL;
     });
   
-    // Logout Button Event
+    // Logout Button Event: clear login state and reload page
     logoutButton.addEventListener("click", () => {
       localStorage.removeItem("discordUser");
-      // Optionally clear user-specific plugins if desired
-      // localStorage.removeItem("userPlugins");
       window.location.reload();
     });
   
-    // Display user info, update UI, and show Manage Plugins menu if logged in
+    // Display user info after login: update UI and show Manage Plugins menu
     function displayUserInfo(user) {
       welcomeMessage.textContent = `Welcome, ${user.username}`;
       userPanel.classList.remove("hidden");
       discordLoginButton.classList.add("hidden");
-      // Show the "Manage Plugins" menu item
+      // Show "Manage Plugins" navigation if logged in
       navManage.classList.remove("hidden");
-      // By default, show All Plugins section; user can click Manage if desired.
-      // Also, if logged in, load the user's plugins.
+      // By default, show the Manage Plugins section for logged-in users
+      sectionManage.classList.remove("hidden");
+      sectionAll.classList.add("hidden");
+      // Load plugins uploaded by the user
       loadUserPlugins(user.username);
     }
   
-    // Handle OAuth redirection: check for a "code" parameter in the URL
+    // Handle OAuth redirection: if URL has a "code" parameter, simulate user data fetch
     const urlParams = new URLSearchParams(window.location.search);
     const code = urlParams.get("code");
     if (code) {
-      // In production, you would exchange the code for an access token on your backend.
-      // Here, we simulate the process.
+      // In production, exchange the code for an access token on your backend.
+      // Here we simulate the process.
       fetchDiscordUserData(code).then(user => {
         localStorage.setItem("discordUser", JSON.stringify(user));
-        // Remove the "code" from the URL (optional)
+        // Remove the code parameter from the URL
         window.history.replaceState({}, document.title, window.location.pathname);
         displayUserInfo(user);
       });
     }
   
-    // Simulated function to fetch Discord user data – replace with your API call
+    // Simulated function to fetch Discord user data – replace with your actual API call
     async function fetchDiscordUserData(code) {
-      // Simulate network delay and return a dummy user object
       return new Promise(resolve => {
         setTimeout(() => {
-          // Here, you should return the actual Discord username from your backend.
-          // For demonstration, we check if a query parameter "username" is provided,
-          // otherwise we default to "ActualDiscordUser"
-          const simulatedUsername = "ActualDiscordUser"; // Change this as needed
-          resolve({ username: simulatedUsername });
+          // Simulate receiving the actual Discord username.
+          // Replace this dummy value with your real Discord username.
+          resolve({ username: "ActualDiscordUser" });
         }, 1000);
       });
     }
   
-    // Save a plugin to localStorage (this simulates persistent storage in this demo)
+    // Save a plugin to localStorage
     function savePlugin(plugin) {
       let plugins = JSON.parse(localStorage.getItem("plugins")) || [];
       plugins.push(plugin);
@@ -122,11 +114,14 @@ document.addEventListener('DOMContentLoaded', () => {
       renderPluginList(userPlugins, userPluginList, true);
     }
   
-    // Render a list of plugins into a given container.
+    // Render a list of plugins into the specified container.
     // If management is true, include a delete button.
-    // Additionally, if the logged-in user is "theboc", add a delete button for every plugin.
+    // Additionally, if the logged-in user is "theboc", show a delete button for every plugin.
     function renderPluginList(plugins, container, management) {
       container.innerHTML = "";
+      const currentUser = localStorage.getItem("discordUser")
+        ? JSON.parse(localStorage.getItem("discordUser")).username.toLowerCase()
+        : "";
       plugins.forEach(plugin => {
         const pluginCard = document.createElement("div");
         pluginCard.classList.add("plugin-card");
@@ -136,10 +131,13 @@ document.addEventListener('DOMContentLoaded', () => {
           <p><strong>Model ID:</strong> ${plugin.modelId}</p>
           <p><strong>Author:</strong> ${plugin.author}</p>
         `;
-        // If this is a management view (the plugin belongs to the logged-in user)
-        // OR if the logged-in user is "theboc" (admin), show a delete button.
-        const storedUser = localStorage.getItem("discordUser");
-        if (management || (storedUser && JSON.parse(storedUser).username.toLowerCase() === "theboc")) {
+        // Show delete button if:
+        // - In management view (the plugin belongs to the logged-in user)
+        // OR if the logged-in user is "theboc" (admin)
+        if (
+          management ||
+          (currentUser === "theboc" && currentUser !== "")
+        ) {
           const deleteBtn = document.createElement("button");
           deleteBtn.textContent = "Delete Plugin";
           deleteBtn.addEventListener("click", () => {
@@ -170,12 +168,13 @@ document.addEventListener('DOMContentLoaded', () => {
       const title = document.getElementById("plugin-title").value;
       const modelId = document.getElementById("plugin-model-id").value;
       const description = document.getElementById("plugin-description").value;
-      // Use Date.now() as a simple unique ID
+      // Generate a unique ID using Date.now()
       const id = Date.now();
       const user = JSON.parse(localStorage.getItem("discordUser"));
+      // Use the logged-in user's Discord username as the author
       const plugin = { id, title, modelId, description, author: user.username };
       savePlugin(plugin);
-      // Refresh both public and user-specific lists
+      // Refresh both the public plugin list and the user's plugin management list
       loadAllPlugins();
       loadUserPlugins(user.username);
       // Clear the form
@@ -183,15 +182,15 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
   
-  // Global deletePlugin function (for inline usage if needed)
+  // Global deletePlugin function
   function deletePlugin(id) {
     let plugins = JSON.parse(localStorage.getItem("plugins")) || [];
     plugins = plugins.filter(plugin => plugin.id !== id);
     localStorage.setItem("plugins", JSON.stringify(plugins));
-    // Refresh public list
+    // Refresh the public plugin list
     const pluginList = document.getElementById("plugin-list");
     renderPluginList(plugins, pluginList, false);
-    // Refresh user management list if user is logged in
+    // Refresh the user plugin list if logged in
     const storedUser = localStorage.getItem("discordUser");
     if (storedUser) {
       const user = JSON.parse(storedUser);
@@ -201,9 +200,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
   
-  // Helper: Render a plugin list (defined globally for reuse)
+  // Global helper: Render a plugin list into a given container
   function renderPluginList(plugins, container, management) {
     container.innerHTML = "";
+    const currentUser = localStorage.getItem("discordUser")
+      ? JSON.parse(localStorage.getItem("discordUser")).username.toLowerCase()
+      : "";
     plugins.forEach(plugin => {
       const pluginCard = document.createElement("div");
       pluginCard.classList.add("plugin-card");
@@ -213,9 +215,10 @@ document.addEventListener('DOMContentLoaded', () => {
         <p><strong>Model ID:</strong> ${plugin.modelId}</p>
         <p><strong>Author:</strong> ${plugin.author}</p>
       `;
-      // Determine if a delete button should be shown:
-      const storedUser = localStorage.getItem("discordUser");
-      if (management || (storedUser && JSON.parse(storedUser).username.toLowerCase() === "theboc")) {
+      if (
+        management ||
+        (currentUser === "theboc" && currentUser !== "")
+      ) {
         const deleteBtn = document.createElement("button");
         deleteBtn.textContent = "Delete Plugin";
         deleteBtn.addEventListener("click", () => {
