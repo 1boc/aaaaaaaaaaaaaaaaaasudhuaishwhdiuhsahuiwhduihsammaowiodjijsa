@@ -12,9 +12,9 @@
       <h1>Plugin Marketplace</h1>
     </div>
     <div class="header-right">
-      <!-- These elements will be toggled based on login state -->
-      <button id="discord-login">Log in with Discord</button>
-      <div id="user-info" class="hidden">
+      <!-- This block is always visible for login status -->
+      <button id="discord-login" class="hidden">Log in with Discord</button>
+      <div id="user-panel" class="hidden">
         <span id="welcome-message"></span>
         <button id="logout-btn">Log Out</button>
       </div>
@@ -22,11 +22,23 @@
   </header>
 
   <main>
-    <section id="content">
-      <!-- Your content goes here (e.g., plugins, etc.) -->
-      <div id="plugin-list">
-        <!-- Plugins will be listed here -->
-      </div>
+    <!-- Plugin list: visible to everyone -->
+    <section id="plugin-display">
+      <h2>Plugins</h2>
+      <div id="plugin-list"></div>
+    </section>
+
+    <!-- Plugin management: only visible when logged in -->
+    <section id="plugin-management" class="hidden">
+      <h2>Your Plugin Management</h2>
+      <form id="plugin-form">
+        <input type="text" id="plugin-title" placeholder="Plugin Title" required />
+        <input type="text" id="plugin-model-id" placeholder="Model ID" required />
+        <textarea id="plugin-description" placeholder="Plugin Description (Optional)"></textarea>
+        <button type="submit">Upload Plugin</button>
+      </form>
+      <h3>Your Plugins</h3>
+      <div id="user-plugin-list"></div>
     </section>
   </main>
 

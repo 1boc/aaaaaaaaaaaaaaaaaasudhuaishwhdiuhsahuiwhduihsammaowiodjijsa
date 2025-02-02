@@ -26,7 +26,8 @@ body {
     align-items: center;
   }
   
-  .header-right button {
+  .header-right button,
+  .header-right div button {
     margin-left: 10px;
     padding: 8px 12px;
     background: #444;
@@ -37,7 +38,8 @@ body {
     transition: background 0.2s;
   }
   
-  .header-right button:hover {
+  .header-right button:hover,
+  .header-right div button:hover {
     background: #666;
   }
   
@@ -45,21 +47,34 @@ body {
     display: none;
   }
   
-  /* Main Content */
   main {
     padding: 20px;
   }
   
-  #plugin-list {
+  section {
+    margin-bottom: 40px;
+  }
+  
+  #plugin-list,
+  #user-plugin-list {
     margin-top: 20px;
   }
   
-  /* Example plugin card styling */
   .plugin-card {
     background: #fff;
     padding: 15px;
     margin-bottom: 15px;
     border-radius: 6px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  .plugin-card button {
+    margin-top: 10px;
+    background: #b00;
+    border: none;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
   }
   
