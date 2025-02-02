@@ -3,67 +3,62 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RetroStudio Plugin Marketplace</title>
-  <link rel="stylesheet" href="style.css"> <!-- Add your custom styles here -->
+  <title>Discord OAuth with Firebase</title>
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
 </head>
 <body>
-  <header>
-    <h1>RetroStudio Plugin Marketplace</h1>
-  </header>
+  <button id="discord-login">Login with Discord</button>
 
-  <!-- User Info Section (shown when logged in) -->
-  <div id="user-panel" class="hidden">
-    <p id="welcome-message"></p>
-    <button id="logout-btn">Log Out</button>
-  </div>
+  <script type="module">
+    // Firebase Configuration
+    const firebaseConfig = {
+      apiKey: "your-api-key",
+      authDomain: "your-project-id.firebaseapp.com",
+      projectId: "your-project-id",
+      storageBucket: "your-project-id.appspot.com",
+      messagingSenderId: "your-sender-id",
+      appId: "your-app-id"
+    };
 
-  <!-- Login Form (shown when no user is logged in) -->
-  <div id="login-form" class="hidden">
-    <label for="discord-username-input">Enter your Discord Username</label>
-    <input type="text" id="discord-username-input" placeholder="Your Discord Username">
-    <button id="simulate-login-btn">Log In</button>
-  </div>
+    // Initialize Firebase
+    const firebase = await import('https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js');
+    const auth = await import('https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js');
+    firebase.initializeApp(firebaseConfig);
+    
+    // Firebase Auth instance
+    const authInstance = auth.getAuth();
 
-  <!-- Navigation Menu -->
-  <nav>
-    <ul>
-      <li><a href="#" id="nav-all">All Plugins</a></li>
-      <li><a href="#" id="nav-manage">Manage Plugins</a></li>
-    </ul>
-  </nav>
+    // OAuth provider URL for Discord login
+    const discordAuthUrl = "https://discord.com/oauth2/authorize?client_id=1335621884259336303&response_type=code&redirect_uri=https%3A%2F%2F1boc.github.io%2Fcmdbar%2F&scope=identify+openid";
 
-  <!-- Section for Viewing All Plugins -->
-  <section id="section-all" class="hidden">
-    <h2>All Plugins</h2>
-    <input type="text" id="search-input" placeholder="Search for plugins...">
-    <div id="plugin-list"></div>
-  </section>
+    // Redirect user to Discord for OAuth login
+    document.getElementById('discord-login').addEventListener('click', () => {
+      window.location.href = discordAuthUrl;
+    });
 
-  <!-- Section for Managing Plugins (only visible to logged-in users) -->
-  <section id="section-manage" class="hidden">
-    <h2>Manage Your Plugins</h2>
-    <form id="plugin-form">
-      <label for="plugin-title">Plugin Title</label>
-      <input type="text" id="plugin-title" required>
-
-      <label for="plugin-model-id">Model ID</label>
-      <input type="text" id="plugin-model-id" required>
-
-      <label for="plugin-description">Description</label>
-      <textarea id="plugin-description" required></textarea>
-
-      <button type="submit">Submit Plugin</button>
-    </form>
-
-    <h3>Your Plugins</h3>
-    <div id="user-plugin-list"></div>
-  </section>
-
-  <!-- Placeholder for Plugin Cards -->
-  <div id="plugin-cards-placeholder"></div>
-
-  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore.js"></script>
-  <script src="script.js"></script>
+    // Process OAuth code after redirect (in your Firebase Auth server-side or frontend)
+    window.addEventListener('DOMContentLoaded', async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const code = urlParams.get('code');
+      
+      if (code) {
+        // You now have the authorization code; exchange it for an access token
+        // You would typically send this code to your server where you will exchange it for a Discord token
+        console.log('Received code:', code);
+        
+        // If needed, use Firebase Authentication to integrate with the Discord token
+        try {
+          // Here, Firebase would need to verify and authenticate the OAuth code you received
+          const credential = await auth.OAuthProvider('discord.com').credential({ code });
+          const userCredential = await auth.signInWithCredential(authInstance, credential);
+          console.log('Authenticated user:', userCredential.user);
+        } catch (error) {
+          console.error('Authentication error:', error);
+        }
+      }
+    });
+  </script>
 </body>
 </html>
