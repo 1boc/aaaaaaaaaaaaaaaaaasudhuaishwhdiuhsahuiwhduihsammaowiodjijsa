@@ -1,127 +1,83 @@
-// Firebase and DOM elements
-const discordLoginBtn = document.getElementById("discord-login");
-const myPluginsBtn = document.getElementById("my-plugins-btn");
-const createPluginBtn = document.getElementById("create-plugin-btn");
-const uploadBtn = document.getElementById("upload-plugin");
-const modelIdInput = document.getElementById("model-id");
-const titleInput = document.getElementById("title");
-const descriptionInput = document.getElementById("description");
-const pluginList = document.getElementById("plugin-list");
-const myPluginList = document.getElementById("my-plugin-list");
-const searchInput = document.getElementById("plugin-search");
-const userMenu = document.getElementById("user-menu");
-const pluginUpload = document.getElementById("plugin-upload");
-const myPluginsSection = document.getElementById("my-plugins");
-const logoutBtn = document.getElementById("logout-btn");
+// Import Firebase modules
+import { initializeApp } from "firebase/app";
+import { getDatabase, ref, set, get, push } from "firebase/database";
+import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 
-// Firebase authentication and Firestore operations
-discordLoginBtn.addEventListener("click", () => {
-  // Open Discord OAuth URL in a new tab
-  const discordOAuthURL = "https://discord.com/oauth2/authorize?client_id=1335621884259336303&response_type=code&redirect_uri=https%3A%2F%2F1boc.github.io%2Fcmdbar%2F&scope=identify+openid";
-  window.open(discordOAuthURL, '_blank');
-});
+// Firebase config
+const firebaseConfig = {
+  apiKey: "AIzaSyDRgKYjF...",
+  authDomain: "cmdbar-plugin-store.firebaseapp.com",
+  databaseURL: "https://cmdbar-plugin-store-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "cmdbar-plugin-store",
+  storageBucket: "cmdbar-plugin-store.firebasestorage.app",
+  messagingSenderId: "116790966011",
+  appId: "1:116790966011:web:84f9de037fde8551e0625e"
+};
 
-logoutBtn.addEventListener("click", () => {
-  signOut(auth).then(() => {
-    localStorage.removeItem('discordUserId');
-    userMenu.style.display = 'none';
-    loadPlugins();  // Reload plugin list for non-logged-in users
-  }).catch((error) => {
-    console.error("Error logging out:", error);
-  });
-});
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const auth = getAuth(app);
+const discordLoginUrl = "https://discord.com/oauth2/authorize?client_id=1335621884259336303&response_type=code&redirect_uri=https%3A%2F%2F1boc.github.io%2Fcmdbar%2F&scope=identify+openid";
 
-myPluginsBtn.addEventListener("click", () => {
-  pluginUpload.style.display = 'none';
-  myPluginsSection.style.display = 'block';
-});
-
-createPluginBtn.addEventListener("click", () => {
-  pluginUpload.style.display = 'block';
-  myPluginsSection.style.display = 'none';
-});
-
-// Upload Plugin
-uploadBtn.addEventListener("click", async () => {
-  const userId = localStorage.getItem('discordUserId');
-  if (!userId) {
-    alert("You need to log in with Discord first.");
-    return;
-  }
-
-  const modelId = modelIdInput.value;
-  const title = titleInput.value;
-  const description = descriptionInput.value;
-
-  if (!modelId || !title) {
-    alert("Model ID and Title are required.");
-    return;
-  }
-
-  try {
-    await addDoc(collection(db, "plugins"), {
-      userId: userId,
-      discordUsername: auth.currentUser.displayName,
-      modelId: modelId,
-      title: title,
-      description: description,
-      timestamp: new Date()
-    });
-    alert("Plugin uploaded!");
-    loadUserPlugins();
-  } catch (error) {
-    console.error("Error uploading plugin:", error);
-  }
-});
-
-// Load all plugins
-async function loadPlugins() {
-  const querySnapshot = await getDocs(collection(db, "plugins"));
-  pluginList.innerHTML = ""; // Clear current list
-  querySnapshot.forEach(doc => {
-    const plugin = doc.data();
-    const pluginCard = document.createElement('div');
-    pluginCard.classList.add('plugin-card');
-    pluginCard.innerHTML = `
-      <div>
-        <strong>${plugin.title}</strong><br>
-        Model ID: ${plugin.modelId}<br>
-        Published by: ${plugin.discordUsername}<br>
-        ${plugin.description ? `<em>${plugin.description}</em>` : ""}
-      </div>
-    `;
-    pluginList.appendChild(pluginCard);
-  });
+// Function to redirect to Discord login
+function loginWithDiscord() {
+    window.location.href = discordLoginUrl;
 }
 
-// Load user plugins
-async function loadUserPlugins() {
-  const userId = localStorage.getItem('discordUserId');
-  if (!userId) {
-    return;
-  }
+// Handle Discord login response (after redirect)
+async function handleDiscordAuth() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get('code');
 
-  const querySnapshot = await getDocs(collection(db, "plugins"));
-  myPluginList.innerHTML = ""; // Clear current list
-  querySnapshot.forEach(doc => {
-    const plugin = doc.data();
-    if (plugin.userId === userId) {
-      const pluginCard = document.createElement('div');
-      pluginCard.classList.add('plugin-card');
-      pluginCard.innerHTML = `
-        <div>
-          <strong>${plugin.title}</strong><br>
-          Model ID: ${plugin.modelId}<br>
-          <button onclick="deletePlugin('${doc.id}')">Delete</button>
-        </div>
-      `;
-      myPluginList.appendChild(pluginCard);
+    if (code) {
+        console.log("Discord Auth Code:", code);
+        // Here you would exchange the code for an access token via your backend
     }
-  });
 }
 
-// Delete user plugin
-async function deletePlugin(pluginId) {
-  await deleteDoc(doc(db, "plugins", pluginId));
-  loadUserPlugins();
+// Call this on page load to check if the user is logged in
+handleDiscordAuth();
+function addPlugin(title, modelID, description) {
+    const pluginsRef = ref(db, "plugins/");
+    const newPluginRef = push(pluginsRef);
+
+    set(newPluginRef, {
+        id: newPluginRef.key,  // Unique Plugin ID
+        title: title,
+        modelID: modelID,
+        description: description
+    }).then(() => {
+        console.log("Plugin added successfully!");
+    }).catch((error) => {
+        console.error("Error adding plugin:", error);
+    });
 }
+function fetchPlugins() {
+    const pluginsRef = ref(db, "plugins/");
+    
+    get(pluginsRef).then((snapshot) => {
+        if (snapshot.exists()) {
+            const plugins = snapshot.val();
+            const pluginList = document.getElementById("plugin-list");
+            pluginList.innerHTML = "";  // Clear list
+
+            Object.values(plugins).forEach(plugin => {
+                const pluginItem = `
+                    <div class="plugin-card">
+                        <h3>${plugin.title}</h3>
+                        <p><strong>Model ID:</strong> ${plugin.modelID}</p>
+                        <p>${plugin.description}</p>
+                        <p><strong>ID:</strong> ${plugin.id}</p>
+                    </div>
+                `;
+                pluginList.innerHTML += pluginItem;
+            });
+        }
+    }).catch((error) => {
+        console.error("Error fetching plugins:", error);
+    });
+}
+
+// Call fetchPlugins on page load
+fetchPlugins();
