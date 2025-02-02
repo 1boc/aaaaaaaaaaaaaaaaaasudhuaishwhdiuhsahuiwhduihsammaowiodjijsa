@@ -12,6 +12,11 @@
       <h1>Plugin Marketplace</h1>
     </div>
     <div class="header-right">
+      <!-- Navigation Menu -->
+      <nav id="nav-menu">
+        <a href="#" id="nav-all">All Plugins</a>
+        <a href="#" id="nav-manage" class="hidden">Manage Plugins</a>
+      </nav>
       <!-- Login / User Panel -->
       <button id="discord-login" class="hidden">Log in with Discord</button>
       <div id="user-panel" class="hidden">
@@ -22,15 +27,15 @@
   </header>
 
   <main>
-    <!-- Public Plugin Display with Search (visible to all users) -->
-    <section id="plugin-display">
+    <!-- Section: All Plugins (visible to everyone) -->
+    <section id="section-all">
       <h2>All Available Plugins</h2>
       <input type="text" id="search-input" placeholder="Search plugins..." />
       <div id="plugin-list"></div>
     </section>
 
-    <!-- Plugin Management (only for logged-in users) -->
-    <section id="plugin-management" class="hidden">
+    <!-- Section: Manage Plugins (only for logged-in users) -->
+    <section id="section-manage" class="hidden">
       <h2>Your Plugin Management</h2>
       <form id="plugin-form">
         <input type="text" id="plugin-title" placeholder="Plugin Title" required />

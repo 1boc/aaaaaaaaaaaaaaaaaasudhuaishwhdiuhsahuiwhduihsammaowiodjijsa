@@ -26,8 +26,24 @@ body {
     align-items: center;
   }
   
-  .header-right button,
-  .header-right div button {
+  #nav-menu {
+    margin-right: 20px;
+  }
+  
+  #nav-menu a {
+    color: #fff;
+    margin-right: 10px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.2s;
+  }
+  
+  #nav-menu a:hover {
+    color: #ddd;
+  }
+  
+  header button,
+  header div button {
     margin-left: 10px;
     padding: 8px 12px;
     background: #444;
@@ -38,8 +54,8 @@ body {
     transition: background 0.2s;
   }
   
-  .header-right button:hover,
-  .header-right div button:hover {
+  header button:hover,
+  header div button:hover {
     background: #666;
   }
   
