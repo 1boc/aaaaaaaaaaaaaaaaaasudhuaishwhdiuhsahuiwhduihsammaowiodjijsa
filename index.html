@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cmdbar Plugin Marketplace</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Cmdbar Plugin Marketplace</h1>
+        <button id="loginBtn">Login with Discord</button>
+    </header>
+
+    <div class="search-container">
+        <input type="text" id="searchBar" placeholder="Search for plugins...">
+    </div>
+
+    <div id="plugin-list"></div>
+
+    <div id="add-plugin-section">
+        <h2>Add a Plugin</h2>
+        <input type="text" id="plugin-title" placeholder="Title">
+        <input type="text" id="plugin-model-id" placeholder="Model ID">
+        <textarea id="plugin-description" placeholder="Description"></textarea>
+        <button id="add-plugin-btn">Add Plugin</button>
+    </div>
+
+    <script type="module" src="script.js"></script>
+</body>
+</html>
