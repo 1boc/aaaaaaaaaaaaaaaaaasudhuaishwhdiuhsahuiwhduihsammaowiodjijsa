@@ -119,8 +119,10 @@ document.addEventListener('DOMContentLoaded', () => {
             plugin.autoId = nextId;
             // Save the plugin document.
             await db.collection("plugins").add(plugin);
+            alert("Plugin added successfully!");
         } catch (error) {
             console.error("Error saving plugin:", error);
+            alert("Error adding plugin. Please try again.");
         }
     }
 
@@ -131,7 +133,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 .orderBy("autoId", "asc")
                 .get();
             const plugins = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            renderPluginList(plugins, pluginList, false);
+            if (plugins.length === 0) {
+                pluginList.innerHTML = "<p>No plugins available.</p>";
+            } else {
+                renderPluginList(plugins, pluginList, false);
+            }
         } catch (error) {
             console.error("Error loading all plugins:", error);
         }
@@ -145,7 +151,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 .orderBy("autoId", "asc")
                 .get();
             const userPlugins = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            renderPluginList(userPlugins, userPluginList, true);
+            if (userPlugins.length === 0) {
+                userPluginList.innerHTML = "<p>You have no plugins uploaded.</p>";
+            } else {
+                renderPluginList(userPlugins, userPluginList, true);
+            }
         } catch (error) {
             console.error("Error loading user plugins:", error);
         }
