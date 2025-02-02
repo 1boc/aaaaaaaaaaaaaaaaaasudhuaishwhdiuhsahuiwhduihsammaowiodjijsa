@@ -1,28 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Plugin Marketplace</title>
-    <link rel="stylesheet" href="main.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Plugin Marketplace</title>
+  <link rel="stylesheet" href="main.css" />
 </head>
 <body>
-    <header>
-        <h1>Welcome to the Plugin Marketplace</h1>
-        <div id="user-info" class="hidden">
-            <p id="welcome-message"></p>
-            <button id="logout-btn" class="hidden">Log Out</button>
-        </div>
-        <button id="discord-login" class="hidden">Log in with Discord</button>
-    </header>
+  <header>
+    <div class="header-left">
+      <h1>Plugin Marketplace</h1>
+    </div>
+    <div class="header-right">
+      <!-- These elements will be toggled based on login state -->
+      <button id="discord-login">Log in with Discord</button>
+      <div id="user-info" class="hidden">
+        <span id="welcome-message"></span>
+        <button id="logout-btn">Log Out</button>
+      </div>
+    </div>
+  </header>
 
-    <!-- Main Content (Plugins) -->
-    <main>
-        <div id="plugin-list">
-            <!-- Plugins will be listed here -->
-        </div>
-    </main>
+  <main>
+    <section id="content">
+      <!-- Your content goes here (e.g., plugins, etc.) -->
+      <div id="plugin-list">
+        <!-- Plugins will be listed here -->
+      </div>
+    </section>
+  </main>
 
-    <script src="main.js"></script>
+  <script src="main.js"></script>
 </body>
 </html>
