@@ -2,7 +2,7 @@ import { db } from "./firebase.js";
 import { collection, getDocs } from "firebase/firestore";
 
 async function loadPlugins() {
-    const querySnapshot = await getDocs(collection(db, "cmdbar-plugin-store"));
+    const querySnapshot = await getDocs(collection(db, "CmdbarPluginStoreWeb"));
     const pluginList = document.getElementById("plugin-list");
     pluginList.innerHTML = "";
 
